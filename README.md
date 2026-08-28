@@ -1,6 +1,14 @@
-# SimpleStore
+# SimpleStore CI/CD
 
-SimpleStore is a full-stack e-commerce application built with React, TypeScript, Redux Toolkit, React Query, and Firebase. It uses Firebase Authentication and Firestore to provide secure user authentication, product management, shopping cart functionality, and order management.
+SimpleStore is a full-stack e-commerce application built with React, TypeScript, Redux Toolkit, React Query, and Firebase. The project includes a complete Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions and Vercel to automatically test, build, and deploy the application.
+
+## Live Application
+
+**Live Demo:** https://simplestore-cicd.vercel.app/
+
+## GitHub Repository
+
+https://github.com/shadowless005/simplestore-cicd
 
 ## Features
 
@@ -19,6 +27,32 @@ SimpleStore is a full-stack e-commerce application built with React, TypeScript,
 - View order details
 - Responsive design
 
+## Testing
+
+The project follows Test-Driven Development (TDD) principles using React Testing Library and Vitest.
+
+### Unit Tests
+
+- Footer component renders correctly.
+- Navbar correctly displays the cart item count.
+
+### Integration Test
+
+- Verifies that adding a product updates the shopping cart state and user interface correctly.
+
+## Continuous Integration (CI)
+
+GitHub Actions automatically:
+
+- Installs project dependencies
+- Runs all unit and integration tests
+- Builds the production application
+- Prevents deployment if any step fails
+
+## Continuous Deployment (CD)
+
+After all tests and the production build pass successfully, GitHub Actions automatically deploys the application to Vercel.
+
 ## Technologies Used
 
 - React
@@ -27,7 +61,11 @@ SimpleStore is a full-stack e-commerce application built with React, TypeScript,
 - React Query
 - React Router
 - Firebase Authentication
-- Firestore
+- Firebase Firestore
+- Vitest
+- React Testing Library
+- GitHub Actions
+- Vercel
 - CSS
 
 ## Installation
@@ -35,7 +73,7 @@ SimpleStore is a full-stack e-commerce application built with React, TypeScript,
 Clone the repository:
 
 ```bash
-git clone https://github.com/shadowless005/advanced-ecommerce.git
+git clone https://github.com/shadowless005/simplestore-cicd.git
 ```
 
 Install dependencies:
@@ -50,7 +88,14 @@ Run the application:
 npm run dev
 ```
 
+Run the test suite:
+
+```bash
+npm test
+```
+
 ## Author
 
-Matthew Shin  
+Matthew Shin
+
 Coding Temple Software Engineering Bootcamp
