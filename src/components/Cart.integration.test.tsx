@@ -1,37 +1,139 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Navbar from "./Navbar";
-import cartReducer, { addToCart } from "../redux/cartSlice";
+import ProductCard from "./ProductCard";
+import Cart from "../pages/Cart";
+import cartReducer from "../redux/cartSlice";
+
+jest.mock("../firebaseConfig", () => ({
+  auth: { currentUser: null },
+  db: {},
+}));
+
+jest.mock("firebase/auth", () => ({
+  signOut: jest.fn(),
+}));
+
+jest.mock("firebase/firestore", () => ({
+  deleteDoc: jest.fn(),
+  doc: jest.fn(),
+  addDoc: jest.fn(),
+  collection: jest.fn(),
+  serverTimestamp: jest.fn(),
+}));
 
 describe("Cart Integration", () => {
-  test("updates the cart badge after adding a product", () => {
+  test("adding a product updates the real cart, quantities, totals, and storage", async () => {
+    const user = userEvent.setup();
+
     const store = configureStore({
       reducer: {
         cart: cartReducer,
       },
+      preloadedState: {
+        cart: {
+          items: [],
+        },
+      },
     });
 
-    store.dispatch(
-      addToCart({
-        id: "1",
-        title: "Test Product",
-        price: 25,
-        image: "test.jpg",
-        quantity: 1,
-      }),
-    );
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
 
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Navbar user={null} />
+          <QueryClientProvider client={client}>
+            <Navbar user={null} />
+
+            <ProductCard
+              product={{
+                id: "demo",
+                title: "Demo mug",
+                price: 25,
+                image: "demo.jpg",
+                category: "Home",
+                description: "A demo mug",
+                rating: {
+                  rate: 4,
+                  count: 2,
+                },
+              }}
+            />
+
+            <Cart />
+          </QueryClientProvider>
         </MemoryRouter>
       </Provider>,
     );
 
-    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /add to cart/i,
+      }),
+    );
+
+    const cart = screen.getByRole("main");
+
+    expect(
+      within(cart).getByRole("heading", {
+        name: "Demo mug",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("link", {
+        name: /Cart 1/,
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      within(cart).getByRole("button", {
+        name: "Increase quantity",
+      }),
+    );
+
+    expect(
+      screen.getByRole("link", {
+        name: /Cart 2/,
+      }),
+    ).toBeInTheDocument();
+
+    expect(within(cart).getAllByText("$50.00")).not.toHaveLength(0);
+
+    expect(
+      JSON.parse(sessionStorage.getItem("cart")!)[0].quantity,
+    ).toBe(2);
+
+    await user.click(
+      within(cart).getByRole("button", {
+        name: "Decrease quantity",
+      }),
+    );
+
+    expect(store.getState().cart.items[0].quantity).toBe(1);
+
+    await user.click(
+      within(cart).getByRole("button", {
+        name: "Remove",
+      }),
+    );
+
+    expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
+    expect(JSON.parse(sessionStorage.getItem("cart")!)).toEqual([]);
+
+    client.clear();
   });
 });

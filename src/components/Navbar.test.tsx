@@ -6,6 +6,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import Navbar from "./Navbar";
 import cartReducer from "../redux/cartSlice";
 
+jest.mock("../firebaseConfig", () => ({
+  auth: { currentUser: null },
+  db: {},
+}));
+
+jest.mock("firebase/auth", () => ({
+  signOut: jest.fn(),
+}));
+
 describe("Navbar", () => {
   test("shows the total number of cart items", () => {
     const testStore = configureStore({
