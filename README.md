@@ -1,6 +1,6 @@
 # SimpleStore CI/CD
 
-SimpleStore is a full-stack e-commerce application built with React, TypeScript, Redux Toolkit, React Query, and Firebase. The project includes a complete Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions and Vercel to automatically test, build, and deploy the application.
+SimpleStore is an e-commerce application built with React, TypeScript, Redux Toolkit, React Query, and Firebase. The project includes a Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions and Vercel to automatically test, build, and deploy the application.
 
 ## Live Application
 
@@ -29,7 +29,7 @@ https://github.com/shadowless005/simplestore-cicd
 
 ## Testing
 
-The project follows Test-Driven Development (TDD) principles using React Testing Library and Vitest.
+The project uses React Testing Library and Vitest to test application components and functionality.
 
 ### Unit Tests
 
@@ -74,6 +74,12 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/shadowless005/simplestore-cicd.git
+```
+
+Navigate into the project:
+
+```bash
+cd simplestore-cicd
 ```
 
 Install dependencies:
