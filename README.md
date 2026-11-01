@@ -1,10 +1,10 @@
 # SimpleStore CI/CD
 
-SimpleStore is an e-commerce application built with React, TypeScript, Redux Toolkit, React Query, and Firebase. The project includes a Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions and Vercel to automatically test, build, and deploy the application.
+SimpleStore is an e-commerce application built with React, TypeScript, Redux Toolkit, React Query, and Firebase. This project adds automated testing with Jest and a GitHub Actions pipeline that tests, builds, and deploys the application to Vercel.
 
 ## Live Application
 
-**Live Demo:** https://simplestore-cicd.vercel.app/
+[Open SimpleStore](https://simplestore-cicd.vercel.app/)
 
 ## GitHub Repository
 
@@ -12,96 +12,187 @@ https://github.com/shadowless005/simplestore-cicd
 
 ## Features
 
-- User registration and login with Firebase Authentication
-- User profile management (Create, Read, Update, Delete)
-- Browse products from Firestore
-- Search products
-- Filter products by category
-- Add new products
-- Edit existing products
-- Delete products
-- Shopping cart with quantity management
-- Secure checkout
-- Store orders in Firestore
-- View order history
-- View order details
+- User registration, login, and logout with Firebase Authentication
+- User profile management
+- Product browsing, searching, and category filtering
+- Create, edit, and delete products stored in Firestore
+- Shopping cart with quantity controls and product removal
+- Cart totals that update when items change
+- Cart persistence using sessionStorage
+- Demonstration checkout that saves orders in Firestore
+- Order history and individual order details
 - Responsive design
 
-## Testing
-
-The project uses React Testing Library and Vitest to test application components and functionality.
-
-### Unit Tests
-
-- Footer component renders correctly.
-- Navbar correctly displays the cart item count.
-
-### Integration Test
-
-- Verifies that adding a product updates the shopping cart state and user interface correctly.
-
-## Continuous Integration (CI)
-
-GitHub Actions automatically:
-
-- Installs project dependencies
-- Runs all unit and integration tests
-- Builds the production application
-- Prevents deployment if any step fails
-
-## Continuous Deployment (CD)
-
-After all tests and the production build pass successfully, GitHub Actions automatically deploys the application to Vercel.
+Checkout demonstrates order storage and does not process real payments.
 
 ## Technologies Used
 
 - React
 - TypeScript
+- Vite
+- React Router
 - Redux Toolkit
 - React Query
-- React Router
 - Firebase Authentication
-- Firebase Firestore
-- Vitest
+- Cloud Firestore
+- Jest
 - React Testing Library
+- Testing Library user-event
 - GitHub Actions
 - Vercel
 - CSS
 
-## Installation
+## Getting Started
 
-Clone the repository:
+### Prerequisites
+
+- Node.js 24
+- npm
+- A configured Firebase project with Email/Password Authentication and Firestore enabled
+
+### Installation
+
+Clone the repository and enter the project folder:
 
 ```bash
 git clone https://github.com/shadowless005/simplestore-cicd.git
-```
-
-Navigate into the project:
-
-```bash
 cd simplestore-cicd
 ```
 
-Install dependencies:
+Install dependencies using the lockfile:
 
 ```bash
-npm install
+npm ci
 ```
 
-Run the application:
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Run the test suite:
+Open the Local URL displayed in the terminal.
+
+### Firebase Configuration
+
+Firebase initialization is located in `src/firebaseConfig.ts`.
+
+To use your own Firebase project:
+
+1. Register a web application in the Firebase console.
+2. Update the Firebase web configuration in `src/firebaseConfig.ts`.
+3. Enable Email/Password Authentication.
+4. Create a Firestore database.
+5. Configure Firestore security rules for products, user profiles, and orders.
+6. Add products through the application.
+
+The application uses the `users`, `products`, and `orders` collections. Firestore rules must enforce access permissions; frontend route protection alone does not secure database records.
+
+## Testing
+
+The project uses Jest and React Testing Library. Firebase dependencies are mocked in relevant tests so they do not require a live Firebase connection.
+
+### Unit Tests
+
+- **Footer.test.tsx:** Verifies that the SimpleStore branding and shopping description render.
+- **Navbar.test.tsx:** Renders the Navbar with controlled Redux state and verifies the cart quantity.
+
+### Integration Test
+
+**Cart.integration.test.tsx** renders ProductCard, Navbar, and Cart with a shared Redux store.
+
+It simulates user interactions to verify:
+
+- Adding a product through the Add to Cart button
+- Displaying the product in the cart
+- Updating the Navbar cart count
+- Increasing and decreasing quantities
+- Updating totals and sessionStorage
+- Removing the product and displaying the empty cart
+
+### Run Tests
 
 ```bash
 npm test
 ```
 
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Generate a coverage report:
+
+```bash
+npm run coverage
+```
+
+## Build and Lint
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+Run ESLint:
+
+```bash
+npm run lint
+```
+
+## Continuous Integration
+
+The workflow is defined in `.github/workflows/main.yml` and runs automatically when code is pushed to `main`.
+
+The `build-and-test` job:
+
+1. Checks out the repository.
+2. Sets up Node.js 24.
+3. Installs dependencies.
+4. Runs the Jest tests.
+5. Builds the production application.
+
+If the tests or build fail, the job fails.
+
+## Continuous Deployment
+
+The `deploy` job uses `needs: build-and-test`, so this workflow deploys only after the testing and build job succeeds.
+
+It uses the Vercel CLI to:
+
+1. Pull the production project configuration.
+2. Build the Vercel production artifact.
+3. Deploy the prebuilt artifact.
+
+The following GitHub Actions repository secrets are required:
+
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+- `VERCEL_TOKEN`
+
+Secret values should never be committed to the repository.
+
+## Manual Verification
+
+Before presenting or submitting:
+
+- Confirm the latest GitHub Actions test/build and deployment jobs succeeded.
+- Open the live Vercel application.
+- Verify products load from Firestore.
+- Add a product to the cart, change its quantity, and remove it.
+- Confirm Firebase account and order features work with the deployed configuration.
+
+Automated tests cover selected behavior. Live Firebase permissions and deployment configuration also require verification.
+
 ## Author
 
-Matthew Shin
-
+Matthew Shin  
 Coding Temple Software Engineering Bootcamp
